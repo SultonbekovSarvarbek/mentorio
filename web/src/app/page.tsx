@@ -89,10 +89,20 @@ export default function Home() {
     setIsSubmitting(true);
     
     try {
-      const response = await fetch("/api/waitlist", {
+      // Use Formspree for form submission
+      const response = await fetch("https://formspree.io/f/meozpzld", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, name, startup }),
+        headers: { 
+          "Content-Type": "application/json",
+          "Accept": "application/json"
+        },
+        body: JSON.stringify({ 
+          email, 
+          name, 
+          startup,
+          language: lang,
+          timestamp: new Date().toISOString()
+        }),
       });
 
       if (response.ok) {
@@ -104,9 +114,18 @@ export default function Home() {
           setName("");
           setStartup("");
         }, 2000);
+      } else {
+        const data = await response.json();
+        console.error("Formspree error:", data);
+        alert(lang === 'ru' 
+          ? 'Произошла ошибка при отправке. Пожалуйста, попробуйте еще раз.' 
+          : 'An error occurred while submitting. Please try again.');
       }
     } catch (error) {
       console.error("Error:", error);
+      alert(lang === 'ru' 
+        ? 'Произошла ошибка при отправке. Пожалуйста, попробуйте еще раз.' 
+        : 'An error occurred while submitting. Please try again.');
     } finally {
       setIsSubmitting(false);
     }
@@ -243,7 +262,7 @@ export default function Home() {
             </p>
           </div>
           
-          <div className="flex justify-center mb-8 gap-2">
+          <div className="flex justify-center flex-wrap mb-8 gap-2">
             {t.examples.tabs.map((tab) => (
               <Button
                 key={tab.id}
@@ -623,7 +642,7 @@ export default function Home() {
                 </a>
               </p>
             </div>
-            <div className="flex space-x-6">
+            <div className="flex flex-wrap space-x-6">
               <a href="#" className="hover:text-blue-400">{t.footer.about}</a>
               <a href="#" className="hover:text-blue-400">{t.footer.blog}</a>
               <a href="#" className="hover:text-blue-400">{t.footer.contacts}</a>
